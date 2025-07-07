@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PyDaewoo - Home</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #001f3f, #0074D9);
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: url("{{ url_for('static', filename='daewoo.jpg') }}") no-repeat center center/cover;
+      position: relative;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+    .btn-glow {
+      background-color: #00BFFF;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      margin: 10px;
+    }
+    .btn-glow:hover {
+      box-shadow: 0 0 15px 4px rgba(0, 191, 255, 0.7);
+      transform: scale(1.05);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: black;
+    }
+    footer {
+      background-color: #000814;
+      padding: 20px;
+      text-align: center;
+      color: #ccc;
+    }
+    a.nav-link.active {
+      color: #00BFFF !important;
+      font-weight: bold;
+    }
+    .hero {
+  height: 100vh;
+  background: url("{{ url_for('static', filename='daewoo.jpg') }}") no-repeat center center / cover;
+  background-attachment: scroll;
+  will-change: transform;
+  position: relative;
+}
+
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">PyDaewoo</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/check">Check Ticket</a></li>
+        {% if session.get('admin_logged_in') %}
+          <li class="nav-item"><a class="nav-link" href="/admin/tickets">Admin Panel</a></li>
+          <li class="nav-item"><a class="nav-link" href="/admin/logout">Logout (Admin)</a></li>
+        {% elif session.get('user') %}
+          <li class="nav-item"><a class="nav-link" href="/logout">Logout ({{ session['user'] }})</a></li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+          <li class="nav-item"><a class="nav-link" href="/admin">Admin Login</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<div class="hero">
+  <div class="hero-content">
+    <h1 class="display-4">Welcome to PyDaewoo</h1>
+    <p class="lead">Book your comfortable journey with just a few clicks.</p>
+    <a href="#routes" class="btn btn-glow">🎫 Book a Ticket</a>
+    <a href="/check" class="btn btn-glow">🔎 Check Ticket</a>
+  </div>
+</div>
+
+<!-- Bus Routes -->
+<div id="routes" class="container my-5 bg-white p-4 text-dark rounded shadow">
+  <h3 class="text-center text-primary mb-4">Available Routes</h3>
+  {% for route in routes %}
+  <div class="card glass-card mb-3">
+    <div class="card-body">
+      <div class="row align-items-center">
+        <div class="col-md-3 text-center">
+          <h5>{{ route.time }}</h5>
+          <p class="mb-1">{{ route.from }}</p>
+          <p>↓</p>
+          <p class="mb-1">{{ route.to }}</p>
+          <p>{{ route.arrival }}</p>
+        </div>
+        <div class="col-md-4">
+          <p class="mb-1"><strong>{{ route.route }}</strong></p>
+          <p class="text-muted">🚌 {{ route.bus_type }} | 📍 {{ route.distance }} KM | ⏱ {{ route.duration }}</p>
+        </div>
+        <div class="col-md-2 text-center">
+          <p class="text-danger text-decoration-line-through mb-1">Rs. {{ route.price }}</p>
+          <p class="text-success fw-bold">Rs. {{ route.discounted }}</p>
+        </div>
+        <div class="col-md-3 text-end">
+          <span class="badge bg-primary">Seats: {{ 25 - route.seat_map | select('equalto', True) | list | length }}</span><br>
+          <a href="{{ url_for('book', route_id=route.id) }}" class="btn btn-sm btn-success mt-2">Book Now</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Footer -->
+<footer>
+  <h5>Contact Us</h5>
+  <p>Email: <a href="mailto:Shahafnan034@gmail.com" style="color: #00BFFF">Shahafnan034@gmail.com</a></p>
+  <p>&copy; 2025 PyDaewoo Transport Services</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
