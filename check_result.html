@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎫 Ticket Status | PyDaewoo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #e3f2fd, #ffffff);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+    }
+
+    .ticket-box {
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      max-width: 700px;
+      width: 100%;
+    }
+
+    .ticket-box h3 {
+      font-weight: bold;
+      margin-bottom: 30px;
+      color: #0d6efd;
+    }
+
+    .list-group-item {
+      font-size: 17px;
+      padding: 15px 20px;
+    }
+
+    .btn-back {
+      margin-top: 25px;
+    }
+
+    .no-ticket {
+      color: #dc3545;
+      font-weight: bold;
+    }
+
+    .ticket-separator {
+      margin: 25px 0;
+      border-top: 2px dashed #dee2e6;
+    }
+  </style>
+</head>
+<body>
+  <div class="ticket-box text-center">
+    <h3>🎫 Ticket Details for CNIC: {{ cnic }}</h3>
+
+    {% if tickets and tickets|length > 0 %}
+      {% for ticket in tickets %}
+        <ul class="list-group text-start mb-4">
+          <li class="list-group-item"><strong>Name:</strong> {{ ticket.name }}</li>
+          <li class="list-group-item"><strong>Seat:</strong> {{ ticket.seat }}</li>
+          <li class="list-group-item"><strong>Route:</strong> {{ ticket.route }}</li>
+          <li class="list-group-item"><strong>Time:</strong> {{ ticket.time }}</li>
+        </ul>
+        {% if not loop.last %}
+          <div class="ticket-separator"></div>
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      <h3 class="no-ticket">❌ No ticket found for CNIC: {{ cnic }}</h3>
+    {% endif %}
+
+    <a href="/" class="btn btn-outline-primary btn-back">⬅ Back to Home</a>
+  </div>
+</body>
+</html>

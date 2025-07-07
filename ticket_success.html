@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ticket Confirmation – PyDaewoo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(-45deg, #1d2b64, #f8cdda, #2c3e50, #3498db);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .ticket-box {
+      background: white;
+      padding: 35px;
+      border-radius: 16px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      color: #1d2b64;
+      margin-bottom: 20px;
+    }
+
+    .ticket-detail {
+      text-align: left;
+      margin-top: 20px;
+    }
+
+    .ticket-detail p {
+      margin: 8px 0;
+      font-size: 16px;
+    }
+
+    .back-btn {
+      margin-top: 30px;
+    }
+
+    .back-btn a {
+      text-decoration: none;
+    }
+
+    .badge-success {
+      background-color: #28a745;
+      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ticket-box">
+    <h2>🎫 Ticket Booked Successfully!</h2>
+    <span class="badge badge-success">Confirmed</span>
+
+    <div class="ticket-detail mt-4">
+      <p><strong>🧾 Order No:</strong> {{ ticket.order_no }}</p>
+      <p><strong>👤 Name:</strong> {{ ticket.name }}</p>
+      <p><strong>🆔 CNIC:</strong> {{ ticket.cnic }}</p>
+      <p><strong>💺 Seat No:</strong> {{ ticket.seat }}</p>
+      <p><strong>🗺️ Route:</strong> {{ ticket.route }}</p>
+      <p><strong>🕒 Time:</strong> {{ ticket.time }}</p>
+    </div>
+
+    <div class="back-btn">
+      <a href="/" class="btn btn-outline-primary mt-3">🏠 Back to Home</a>
+    </div>
+  </div>
+
+</body>
+</html>

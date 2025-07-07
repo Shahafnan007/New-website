@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Book a Ticket</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+      background: url("{{ url_for('static', filename='booking.png') }}") no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .booking-container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 20px;
+      max-width: 750px;
+      margin: 50px auto;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-weight: bold;
+      color: #333;
+    }
+    .form-label {
+      font-weight: bold;
+    }
+    .form-control {
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .fancy-button {
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      width: 100%;
+      transition: 0.3s;
+    }
+    .fancy-button:hover {
+      background: linear-gradient(135deg, #ff6b6b, #ff7f50);
+      transform: scale(1.03);
+    }
+    .seat-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .bus {
+      border: 5px solid #222;
+      background: #f0f0f0;
+      border-radius: 25px;
+      padding: 20px 30px;
+      position: relative;
+    }
+    .row-seats {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      gap: 60px;
+    }
+    .side {
+      display: flex;
+      gap: 10px;
+    }
+    .last-row {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      gap: 10px;
+    }
+    .seat {
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      background-color: #28a745;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      line-height: 45px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .seat.booked {
+      background-color: #dc3545;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    .seat.selected {
+      background-color: #ffc107;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+<div class="booking-container">
+  <h2>Book Your Ticket</h2>
+  <form method="POST">
+    <div class="mb-3">
+      <label for="name" class="form-label">Name</label>
+      <input type="text" class="form-control" id="name" name="name" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="cnic" class="form-label">CNIC</label>
+      <input type="text" class="form-control" id="cnic" name="cnic" maxlength="13" pattern="\d{13}" required>
+    </div>
+
+    <input type="hidden" name="route_id" value="{{ selected_route.id }}">
+    <p><strong>Route:</strong> {{ selected_route.route }} at {{ selected_route.time }} ({{ selected_route.seats }} seats left)</p>
+
+    <div id="seat-map" class="seat-container"></div>
+    <input type="hidden" name="selected_seats" id="selected-seats" />
+    <button type="submit" class="fancy-button">🎫 Book Now</button>
+  </form>
+</div>
+
+<script>
+  const route = {{ selected_route | tojson }};
+  const seatMap = document.getElementById('seat-map');
+  const selectedSeatsInput = document.getElementById('selected-seats');
+  let selectedSeats = [];
+
+  function selectSeat(seatNumber) {
+    const seat = document.getElementById(`seat-${seatNumber}`);
+    if (seat.classList.contains('booked')) return;
+
+    if (selectedSeats.includes(seatNumber)) {
+      selectedSeats = selectedSeats.filter(s => s !== seatNumber);
+      seat.classList.remove('selected');
+    } else {
+      selectedSeats.push(seatNumber);
+      seat.classList.add('selected');
+    }
+
+    selectedSeatsInput.value = selectedSeats.join(',');
+  }
+
+  function loadSeatMap() {
+    if (!route) return;
+
+    const seatStates = route.seat_map;
+    const bus = document.createElement('div');
+    bus.className = 'bus';
+
+    let seatCounter = 1;
+    for (let row = 0; row < 5; row++) {
+      const rowDiv = document.createElement('div');
+      rowDiv.className = 'row-seats';
+
+      const left = document.createElement('div');
+      left.className = 'side';
+      const right = document.createElement('div');
+      right.className = 'side';
+
+      for (let i = 0; i < 2; i++) {
+        if (seatCounter <= 20) {
+          left.appendChild(createSeat(seatCounter, seatStates[seatCounter - 1]));
+          seatCounter++;
+        }
+      }
+
+      for (let i = 0; i < 2; i++) {
+        if (seatCounter <= 20) {
+          right.appendChild(createSeat(seatCounter, seatStates[seatCounter - 1]));
+          seatCounter++;
+        }
+      }
+
+      rowDiv.appendChild(left);
+      rowDiv.appendChild(right);
+      bus.appendChild(rowDiv);
+    }
+
+    const lastRow = document.createElement('div');
+    lastRow.className = 'last-row';
+    for (let i = 0; i < 5; i++) {
+      if (seatCounter <= 25) {
+        lastRow.appendChild(createSeat(seatCounter, seatStates[seatCounter - 1]));
+        seatCounter++;
+      }
+    }
+
+    bus.appendChild(lastRow);
+    seatMap.appendChild(bus);
+  }
+
+  function createSeat(seatNumber, isBooked) {
+    const seat = document.createElement('div');
+    seat.id = `seat-${seatNumber}`;
+    seat.className = 'seat';
+    seat.textContent = seatNumber;
+
+    if (isBooked) {
+      seat.classList.add('booked');
+    } else {
+      seat.onclick = () => selectSeat(seatNumber);
+    }
+
+    return seat;
+  }
+
+  // Load seat map on page load
+  loadSeatMap();
+</script>
+</body>
+</html>
